@@ -103,10 +103,12 @@ const app_RoutingForms = createProtectedRouter()
           data: input,
         });
       } catch (e) {
-        if (e.code === "P2002") {
-          throw new TRPCError({
-            code: "CONFLICT",
-          });
+        if (e instanceof Prisma.PrismaClientKnownRequestError) {
+          if (e.code === "P2002") {
+            throw new TRPCError({
+              code: "CONFLICT",
+            });
+          }
         }
         throw e;
       }

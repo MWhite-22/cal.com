@@ -67,6 +67,7 @@ const TextWidget = (props: TextWidgetProps & { type?: string }) => {
 function NumberWidget({ value, setValue, ...remainingProps }: NumberWidgetProps) {
   return (
     <Input
+      name="query-builder"
       type="number"
       className="mt-0"
       value={value}

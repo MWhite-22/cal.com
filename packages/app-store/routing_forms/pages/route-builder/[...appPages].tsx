@@ -10,7 +10,7 @@ import { inferSSRProps } from "@calcom/types/inferSSRProps";
 import { Button } from "@calcom/ui";
 import { Label } from "@calcom/ui/form/fields";
 import { trpc } from "@calcom/web/lib/trpc";
-import type { GetServerSidePropsContext, AppPrisma } from "@calcom/web/pages/apps/[slug]/[...pages]";
+import type { AppGetServerSidePropsContext, AppPrisma } from "@calcom/web/pages/apps/[slug]/[...pages]";
 
 import PencilEdit from "@components/PencilEdit";
 import { SelectWithValidation as Select } from "@components/ui/form/Select";
@@ -178,7 +178,7 @@ const Route = ({
           {moveUp?.check() ? (
             <button
               type="button"
-              className="invisible absolute left-1/2 -mt-4 mb-4 -ml-4 hidden h-7 w-7 scale-0 rounded-full border bg-white p-1 text-gray-400 transition-all hover:border-transparent hover:text-black hover:shadow group-hover:visible group-hover:scale-100 sm:left-[35px] sm:ml-0 sm:block"
+              className="invisible absolute left-1/2 -mt-4 mb-4 -ml-4 hidden h-7 w-7 scale-0 rounded-full border bg-white p-1 text-gray-400 transition-all hover:border-transparent hover:text-black hover:shadow group-hover:visible group-hover:scale-100 sm:left-[19px] sm:ml-0 sm:block"
               onClick={() => moveUp?.fn()}>
               <ArrowUpIcon />
             </button>
@@ -186,7 +186,7 @@ const Route = ({
           {moveDown?.check() ? (
             <button
               type="button"
-              className="invisible absolute left-1/2 mt-8 -ml-4 hidden h-7 w-7 scale-0 rounded-full border bg-white p-1 text-gray-400 transition-all hover:border-transparent hover:text-black hover:shadow group-hover:visible group-hover:scale-100 sm:left-[35px] sm:ml-0 sm:block"
+              className="invisible absolute left-1/2 mt-8 -ml-4 hidden h-7 w-7 scale-0 rounded-full border bg-white p-1 text-gray-400 transition-all hover:border-transparent hover:text-black hover:shadow group-hover:visible group-hover:scale-100 sm:left-[19px] sm:ml-0 sm:block"
               onClick={() => moveDown?.fn()}>
               <ArrowDownIcon />
             </button>
@@ -258,7 +258,7 @@ const Route = ({
                   </div>
                 )
               ) : null}
-              {routes.length !== 1 ? (
+              {routes.length !== 1 && !route.isFallback ? (
                 <button className="ml-5" type="button">
                   <TrashIcon
                     className="m-0 h-4 w-4 text-neutral-500"
@@ -469,10 +469,15 @@ export default function RouteBuilder({
   );
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext, prisma: AppPrisma) {
-  const { query } = context;
-  const formId = query.appPages[0];
-  if (!formId || query.appPages.length > 1) {
+export async function getServerSideProps(context: AppGetServerSidePropsContext, prisma: AppPrisma) {
+  const { params } = context;
+  if (!params) {
+    return {
+      notFound: true,
+    };
+  }
+  const formId = params.appPages[0];
+  if (!formId || params.appPages.length > 1) {
     return {
       notFound: true,
     };
@@ -482,7 +487,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext, pri
       id: formId,
     },
   });
-
   if (!form) {
     return {
       notFound: true,

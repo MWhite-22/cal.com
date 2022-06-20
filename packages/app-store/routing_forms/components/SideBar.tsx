@@ -18,7 +18,15 @@ import { trpc } from "@calcom/web/lib/trpc";
 
 import ConfirmationDialogContent from "@components/dialog/ConfirmationDialogContent";
 
-export default function SideBar({ form, appUrl }) {
+import { getSerializableForm } from "../utils";
+
+export default function SideBar({
+  form,
+  appUrl,
+}: {
+  form: ReturnType<typeof getSerializableForm>;
+  appUrl: string;
+}) {
   const { t } = useLocale();
   const utils = trpc.useContext();
   const router = useRouter();
@@ -36,7 +44,7 @@ export default function SideBar({ form, appUrl }) {
       showToast(`Something went wrong`, "error");
     },
     onSuccess() {
-      router.push(`${appUrl}/apps/routing_forms/forms`);
+      router.push(`/${appUrl}/apps/routing_forms/forms`);
     },
   });
 
